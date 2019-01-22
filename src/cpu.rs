@@ -127,7 +127,7 @@ pub struct CHIP8 {
     pub stack: [u16; 16],
 
     // Monochrome 64 x 32 display 
-    pub display: [u8; 64 *  32],
+    pub display: [[u8; 64]; 32],
 
     // 16 key keypad
     pub keypad: [bool; 16],
@@ -151,7 +151,7 @@ impl CHIP8 {
             sp: 0,
             mem: mem,
             stack: [0; 16],
-            display: [0; 64 *  32],
+            display: [[0; 64];  32],
             keypad: [false; 16],
         }
     }
@@ -189,7 +189,7 @@ impl CHIP8 {
 
         for i in 0..32 {
             for j in 0..64 {
-                disp_dump.push_str(&format!("{}", self.display[((i*32) + j) as usize]));
+                disp_dump.push_str(&format!("{}", self.display[i as usize][j as usize]));
             }
             disp_dump.push_str("\n");
         }
@@ -230,7 +230,7 @@ impl CHIP8 {
 
                     // CLS: Clears the screen
                     0x00E0 => {
-                        self.display = [0; 64 *  32];
+                        self.display = [[0; 64];  32];
                         self.pc += 2;
                     },
 
@@ -438,10 +438,11 @@ impl CHIP8 {
 
                     for x in 0..8 {
                         if pixel & (0x80 >> x) != 0 {
-                            if self.display[(vx + x + ((vy + y) * 64)) as usize] == 1 {
+                            println!("Setting pixel at ({:02}, {:02})", vx+x, vy+y);
+                            if self.display[(vy+y) as usize][(vx+x) as usize] == 1 {
                                 self.V[0xF] = 1;
                             }
-                            self.display[(vx + x + ((vy + y) * 64)) as usize] ^= 1;
+                            self.display[(vy+y) as usize][(vx+x) as usize] ^= 1;
                         }
                     }
                 }
