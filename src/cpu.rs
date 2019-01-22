@@ -368,10 +368,10 @@ impl CHIP8 {
                     for x in 0..8 {
                         if pixel & (0x80 >> x) != 0 {
                             println!("Setting pixel at ({:02}, {:02})", vx+x, vy+y);
-                            if self.display[(vy+y) as usize][(vx+x) as usize] == 1 {
+                            if self.display[((vy+y) % 32) as usize][((vx+x) % 64) as usize] == 1 {
                                 self.V[0xF] = 1;
                             }
-                            self.display[(vy+y) as usize][(vx+x) as usize] ^= 1;
+                            self.display[((vy+y) % 32) as usize][((vx+x) % 64) as usize] ^= 1;
                         }
                     }
                 }
