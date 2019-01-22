@@ -363,10 +363,10 @@ impl CHIP8 {
             0xD000 => {
                 let n: u8  = (opcode & 0x000F) as u8;
                 let vx = self.V[((opcode & 0x0F00) >> 8) as usize];
-                let vy = self.V[((opcode & 0x00F0) >> 8) as usize];
+                let vy = self.V[((opcode & 0x00F0) >> 4) as usize];
                 let mut pixel: u8 = 0;
 
-                println!("Displaying sprite of height {} on ({:02}, {:02})", n, vx, vy);
+                //println!("Displaying sprite of height {} on ({:02}, {:02})", n, vx, vy);
 
                 // Sets collision to 0
                 self.V[0xF] = 0;
@@ -378,7 +378,7 @@ impl CHIP8 {
 
                     for x in 0..8 {
                         if pixel & (0x80 >> x) != 0 {
-                            println!("Setting pixel at ({:02}, {:02})", vx+x, vy+y);
+                            //println!("Setting pixel at ({:02}, {:02})", vx+x, vy+y);
                             if self.display[((vy+y) % 32) as usize][((vx+x) % 64) as usize] == 1 {
                                 self.V[0xF] = 1;
                             }
