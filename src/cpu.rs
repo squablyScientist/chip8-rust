@@ -475,6 +475,16 @@ impl CHIP8 {
             _ => panic!(),
         }
         
-        // TODO update timers
+        if self.delay > 0 {
+            self.delay -= 1;
+        }
+        if self.sound > 0 {
+            if self.sound == 1 {
+
+                // TODO: make this make a real noise
+                println!("BEEP");
+            }
+            self.sound -= 1;
+        }
     }
 }
