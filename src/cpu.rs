@@ -77,7 +77,7 @@ impl CHIP8 {
         }
     }
 
-    pub fn load_program(&mut self, filename: String) {
+    pub fn load_program(&mut self, filename: &str) {
 
         let mut file = File::open(filename).unwrap();
         let mut buf = Vec::new();
@@ -112,8 +112,19 @@ impl CHIP8 {
             for j in 0..64 {
                 disp_dump.push_str(&format!("{}", self.display[i as usize][j as usize]));
             }
-            disp_dump.push_str("\n");
+            disp_dump.push_str(&format!(" {}\n", i));
         }
+        disp_dump.push_str("\n");
+
+        for i in 0..64 {
+            disp_dump.push_str(&format!("{}", i / 10))
+        }
+        disp_dump.push_str("\n");
+
+        for i in 0..64 {
+            disp_dump.push_str(&format!("{}", i % 10))
+        }
+        disp_dump.push_str("\n");
         disp_dump
     }
 
