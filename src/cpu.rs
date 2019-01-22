@@ -127,7 +127,7 @@ pub struct CHIP8 {
     pub stack: [u16; 16],
 
     // Monochrome 64 x 32 display 
-    pub display: [[bool; 64]; 32],
+    pub display: [u8; 64 *  32],
 
     // 16 key keypad
     pub keypad: [bool; 16],
@@ -151,7 +151,7 @@ impl CHIP8 {
             sp: 0,
             mem: mem,
             stack: [0; 16],
-            display: [[false; 64]; 32],
+            display: [0; 64 *  32],
             keypad: [false; 16],
         }
     }
@@ -184,6 +184,35 @@ impl CHIP8 {
         mem_dump
     }
 
+    pub fn dump_display(&self) -> String {
+        let mut disp_dump = String::new();
+
+        for i in 0..32 {
+            for j in 0..64 {
+                disp_dump.push_str(&format!("{}", self.display[((i*32) + j) as usize]));
+            }
+            disp_dump.push_str("\n");
+        }
+        disp_dump
+    }
+
+    pub fn dump_reg(&self) -> String {
+        let mut reg_dump = String::new();
+        reg_dump.push_str(
+            &format!("pc: {:04X}\tsp {:01X}\tI: {:04X}\n", self.pc, self.sp, self.I)
+            );
+        for i in (0..16).step_by(4) {
+            for j in 0..4 {
+                reg_dump.push_str(&format!("V{:X}: {:02X}\t", i + j, self.V[i + j]));
+            }
+            reg_dump.push_str("\n");
+        }
+        let mut opcode: u16  = ((self.mem[self.pc as usize]) as u16) << 8;
+        opcode |= self.mem[(self.pc as usize) + 1] as u16;
+        reg_dump.push_str(&format!("Current Instruction: {:04x}\n", opcode));
+        reg_dump
+    }
+
     pub fn cycle(&mut self) {
         // Fetch
         let pc = self.pc;
@@ -201,7 +230,8 @@ impl CHIP8 {
 
                     // CLS: Clears the screen
                     0x00E0 => {
-                        //TODO implement for clearing
+                        self.display = [0; 64 *  32];
+                        self.pc += 2;
                     },
 
                     // RET: returns from a subroutine
@@ -392,8 +422,31 @@ impl CHIP8 {
                 self.pc += 2;
             },
 
-            // TODO: implement displaying sprite to a screen 
-            0xD000 => {},
+            0xD000 => {
+                let n: u8  = (opcode & 0x000F) as u8;
+                let vx = self.V[((opcode & 0x0F00) >> 8) as usize];
+                let vy = self.V[((opcode & 0x00F0) >> 8) as usize];
+                let mut pixel: u8 = 0;
+
+                // Sets collision to 0
+                self.V[0xF] = 0;
+
+                for y in 0..n {
+
+                    // Pixel is the byte in memory that describes the row of 8 pixels
+                    pixel = self.mem[(self.I + (y as u16)) as usize];
+
+                    for x in 0..8 {
+                        if pixel & (0x80 >> x) != 0 {
+                            if self.display[(vx + x + ((vy + y) * 64)) as usize] == 1 {
+                                self.V[0xF] = 1;
+                            }
+                            self.display[(vx + x + ((vy + y) * 64)) as usize] ^= 1;
+                        }
+                    }
+                }
+                self.pc += 2;
+            },
 
             // Keypad skip instructions
             0xE000 => {
