@@ -355,7 +355,7 @@ impl CHIP8 {
                 let vy = self.V[((opcode & 0x00F0) >> 8) as usize];
                 let mut pixel: u8 = 0;
 
-                println!("Displaying sprite of height {} on ({:02X}, {:02X})", n, vx, vy);
+                println!("Displaying sprite of height {} on ({:02}, {:02})", n, vx, vy);
 
                 // Sets collision to 0
                 self.V[0xF] = 0;
