@@ -166,7 +166,13 @@ impl CHIP8 {
             },
 
             // JP addr: Sets the pc to the lower 3 nibbles of the instruction.
-            0x1000 => self.pc = opcode & 0x0FFF,
+            0x1000 => {
+                let addr = opcode & 0x0FFF;
+                if addr == self.pc {
+                    process::exit(0);
+                }
+                self.pc = opcode & 0x0FFF;
+            },
 
             // CALL addr: puts return addr on the stack and jumps.
             0x2000 => {
