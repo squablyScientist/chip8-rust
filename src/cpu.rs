@@ -345,7 +345,7 @@ impl CHIP8 {
                             self.V[0xF] = 0;
                         }
 
-                        self.V[x] -= self.V[y];
+                        self.V[x] = self.V[x].wrapping_sub(self.V[y]);
                     },
 
                     // SHR Vx (, Vy) : Shifts Vx right by 1, setting VF to 1 if the lsb was 1
@@ -372,7 +372,7 @@ impl CHIP8 {
                             self.V[0xF] = 0;
                         }
 
-                        self.V[x] = self.V[y] - self.V[x];
+                        self.V[x] = self.V[y].wrapping_sub(self.V[x]);
                     },
 
                     // SHR Vx (,Vy) : Shifts Vx right and sets VF 1 if msb was 1 before shift
